@@ -6,28 +6,10 @@
 
 | 工具 | 说明 | 技术栈 | 入口 |
 |---|---|---|---|
-| 网站图片 Alt 标签检查工具 | 批量检测网页图片的 Alt 标签写法情况，输出 Excel 报告 | Python + BeautifulSoup + openpyxl | `alt-scanner/alt_scanner.py` |
 | 实况照片备份查看器 | 把 iPhone 实况照片从云盘/硬盘一键备份成 GIF 动图，生成可分享的网页查看器 | Python + Pillow + imageio-ffmpeg | `livephoto-viewer/LivePhoto_Backup.pyw` |
 | QQ 空间相册下载器 | 抓取本人 QQ 空间相册的照片与视频并批量下载到本地 | Python + Playwright + 自研 GUI | `qzone-album/scripts/gui.py` |
 
----
-
-## alt-scanner · 网站图片 Alt 标签检查工具
-
-批量检测网站图片的 Alt 标签写法，输出 Excel 报告，便于 SEO 优化与无障碍检查。
-
-**技术栈**：Python + BeautifulSoup（HTML 解析）+ openpyxl（Excel 输出）
-
-**特点**：
-- 抓取站点图片清单，逐张检查 alt 属性写法
-- 输出 Excel 报告：图片地址、alt 现状、建议写法
-- 22EI 图片检测需求的标准执行工具
-
-**运行**：
-```bash
-pip install -r alt-scanner/requirements.txt   # 如有
-python alt-scanner/alt_scanner.py
-```
+两工具相互独立，可单独取用。
 
 ---
 
@@ -90,7 +72,7 @@ python qzone-album/scripts/gui.py
 - **无账号体系** —— 不需要注册登录（qzone-album 复用浏览器已有登录态）
 - **打包产物不入库** —— `dist/` 等可由源码重建的目录不纳入版本管理
 - **凭据不入库** —— 任何密钥 / 口令 / 令牌 / 私钥一律不进版本库（见各目录 `.gitignore`）
-- **一次性检测报告不入库** —— 临时产物（如 alt 检测导出的 Excel）属个人数据，不作��品展示
+- **一次性产物不入库** —— 临时导出报告等属个人数据，不作产品展示
 
 ---
 
@@ -98,8 +80,7 @@ python qzone-album/scripts/gui.py
 
 | 工具 | Python | 外部依赖 |
 |---|---|---|
-| alt-scanner | 3.8+ | openpyxl |
 | livephoto-viewer | 3.8+ | Pillow、imageio-ffmpeg |
 | qzone-album | 3.8+ | Playwright、Edge 浏览器 |
 
-三个工具相互独立，可单独取用。
+两个工具相互独立，可单独取用。
