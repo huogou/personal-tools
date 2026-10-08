@@ -1,0 +1,16 @@
+# 抓包产物（含登录态，不得外传/入库）
+captures/
+session/
+profile/
+# 临时产物
+__pycache__/
+*.pyc
+pip.log
+*.log
+.DS_Store
+Thumbs.db
+# 凭据
+.env
+.env.*
+*.pem
+*.key

@@ -1,0 +1,27 @@
+# 一次性检测报告与个人数据（不入库）
+*.xlsx
+*检测结果*
+*.json
+*.yaml
+# 抓包产物（含登录态）
+captures/
+session/
+profile/
+# 打包产物
+dist/
+__pycache__/
+*.pyc
+*.log
+# 编辑器与系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+# 凭据（禁止入库）
+.env
+.env.*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
