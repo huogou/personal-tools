@@ -1,0 +1,67 @@
+附件 05｜现有架构适配性、依赖与许可证风险
+项目现状基准：上游《项目现状与产品交接报告 V1.0》（2026-11-06），本报告不重复核源码。
+证据等级：官方一手 / 项目自述 / 第三方合规声明（非法律意见）。
+
+════════ 一、现有架构基线（项目自述，来自上游 V1.0）════════
+Python 3.12 + tkinter/ttk 主窗口（V1.3 起「备份 / 相册」双页签）+ imageio-ffmpeg（内置 ffmpeg）+ Pillow（仅读 EXIF）+ PyInstaller 单文件；V1.3 追加 pythonnet(clr) + Edge WebView2 SDK + 7 个 album_*.py（2598 行）。
+现有能力：album_scan.py 只读扫描与同名基名配对、album_index.py 原子索引、album_media.py 封面抽帧与 libx264 转码、album_page.py 静态前端、album_api.py 桥接、album_webview.py WebView2 宿主。
+已发布 dist = V1.2（41.9 MB）；V1.3 双 EXE 已构建（53.1 MB）但未验收、播放 3 FAIL。
+无 Git 仓库；无第三方依赖许可证清单、无隐私说明、无卸载说明、无应用图标、无用户反馈渠道。
+
+════════ 二、任务书 §三 8 项逐条评估 ════════
+1 是否可以在现有架构上扩展？
+【技术上可行，尚未实测】可复用的部分：`album_scan` 的只读扫描 / 配对 / 取消检查点、`album_index` 的原子写与 .bak 自愈、`album_media` 的 ffmpeg 调用与缓存键、`album_api` 的桥接分发模式。
+【观点】但设备层（COM/WPD 或 iOS 协议栈）与格式层（XMP + 容器拼接 + HEIF box）与 Tk/WebView2 无耦合，属独立领域；**不建议塞进 `LivePhoto_Backup.pyw`**（该文件已 2864 行，上游 V1.0 R2 已登记文档与代码漂移问题，继续堆叠会加剧维护负担）。
+【观点】V1.3 本身尚未验收且有 3 项播放 FAIL，在其之上再叠两层新能力，风险叠加；建议先解上游 R1/D1/D2。
+
+2 是否需要独立的设备连接模块？【观点】需要。理由：设备枚举、授权、拔线、传输中断、COM/apartment 线程模型与 GUI 完全不同；独立模块便于单独验证与降级（无设备时完全不加载）。若 D2 裁定「不碰设备层」，此模块可整体取消。
+
+3 是否需要独立的格式转换模块？【观点】需要。理由：XMP 构造、Item:Length 计算、mpvd box、命名正则、规范一致性校验器都是可纯离线单元测试的逻辑，应与 UI 解耦；且必须支持「失败降级为普通照片 + 视频」。
+
+4 是否需要更换或增加第三方依赖？【技术上可行，尚未实测】
+   已有可覆盖：imageio-ffmpeg 负责 remux / libx264 转码 / 抽帧（上游 V1.0 附件 03 已核实内置 ffmpeg 支持 libx264 与 hevc 解码声明）；Python 标准库可做字节拼接。
+   新增缺口：① XMP 读写（JPEG APP1 / HEIF XMP box）② HEIF/ISOBMFF box 级写入（若做 HEIC 版）③ WPD COM 的 Python 绑定（pywin32 / comtypes）④ 可选 iOS 协议栈（pymobiledevice3）。
+   【暂时无法确认】具体库选型、Windows wheel 可用性、与 PyInstaller 单文件打包的兼容性、许可证；**须开发 AI 在授权后做技术验证，本报告不替代选型**。
+   【观点】JPEG 版首版可把新增依赖压到最小（XMP 可手工构造 packet，无需重型库），这是 P2 优于 P3/P4 的理由之一。
+
+5 依赖的许可证及公开分发限制 → 见第三节（本报告最高优先级发现）。
+
+6 是否需要联网或云端服务？
+【已有官方依据】核心处理（本地文件扫描、XMP 拼接、ffmpeg 转码、WPD 本地设备访问）均可纯本地，无需服务器。
+【已有官方依据】但三处需联网：① Apple 设备 App 从 Microsoft Store 安装（B2）；② iCloud 优化存储时下载全分辨率原片到设备（B2/B4）；③ pip 安装新增 Python 依赖（项目 `启动备份查看器.bat` 已有此模式，上游 V1.0 3.3）。
+【观点】因此不可延续 README「零联网」的绝对表述；若产品定位要求「完全离线」，则必须接受「iCloud 优化存储场景拿不到全分辨率」或改用其他导入方式（见主报告 D4）。
+
+7 是否会增加安装包体积？
+【暂时无法确认】必然增加（HEIF/XMP/WPD 库，可能还有 iOS 栈），但本轮未构建、未实测，**不给具体 MB 数值**。
+可参考但不外推：V1.2 EXE 41,878,941 B；V1.3 EXE 53,136,400 B（增量主要来自 pythonnet/WebView2 相关打包，上游 V1.0 3.2）。
+【观点】若引入 pillow-heif 的预编译 wheel（含 x265/libheif/libde265）或 iOS 栈，体积增量可能显著；应在 D2/D3 裁定后由开发 AI 实测。
+
+8 是否存在额外维护成本？
+【观点·高】四类持续成本：① iOS 版本与 Apple 组件更新（iOS 17+ CoreDevice/RemoteXPC tunnel 已是实证，pymobiledevice3 文档自述 17.0–17.3.1 Windows 需额外驱动且不提供）；② Android 版本 / 品牌相册差异；③ Windows WPD/MTP 行为与组策略；④ **格式规范演进**——Motion Photo 1.0 明确废弃旧 Microvideo V1 的 MicroVideoOffset，证明规范会版本性变更，生成端需跟进。
+【观点】与项目「自用、成本优先」定位相比，跨设备能力的长期维护成本可能超过其收益，应由 ChatGPT 在 D1/D6 一并权衡。
+
+════════ 三、许可证与公开分发风险（重点）════════
+★ 发现 A：现有 EXE 已带 GPL 义务，不是本次扩展引入
+【第三方合规声明，非官方审计】`imageio-ffmpeg` 包自身声明 BSD-2-Clause，但其捆绑的 Windows ffmpeg 可执行文件为 `--enable-gpl --enable-version3` 构建（`ffmpeg-win-x86_64-v7.1.exe`，gyan.dev essentials build，含 libx264 与 libx265），`ffmpeg -L` 显示 GPL-3.0-or-later。来源：附件 01 D6 所列第三方项目 THIRD_PARTY_NOTICES / THIRD-PARTY-LICENSES；FFmpeg 官方许可说明见 https://ffmpeg.org/legal.html。
+【项目自述】本项目 V1.2/V1.3 用 PyInstaller 打成单文件 EXE，`发布构建\验收构建_V1.3\spec\...spec` 使用 collect_all 收集 imageio_ffmpeg（上游 V1.0 附件 03/02）→ 属于**再分发 GPL 程序**。
+【观点】再分发通常伴随提供对应源码/书面要约、随附许可文本等义务；但**本报告不是法律意见**，且具体义务取决于所打包二进制的实际构建配置，须以目标 EXE 内 `ffmpeg -L` 输出与打包清单为准。
+【项目自述】V1.0 报告 3.9/R13 已登记：项目无第三方依赖许可证清单、无 LICENSE、无隐私说明。→ 该缺口在「自用不分发」时影响有限，一旦 D1 裁定对外发布即成为前置阻断项。
+
+★ 发现 B：新增 HEIC 编码栈会引入 copyleft
+【第三方合规声明】`pillow-heif` 包元数据声明 BSD-3-Clause，但预编译 Windows wheel 捆绑 libheif（LGPL-3.0）、libde265（LGPL-3.0）与 x265（GPL-2.0-or-later）；仅 wheel 内 `LICENSES_bundled.txt` 说明，元数据扫描器通常不显示。社区规避路径为解码器专用的 `pi-heif`（BSD-3-Clause + libheif LGPL-3.0），或 `pip install --no-binary pillow-heif` 自行构建不含 x265 的版本（附件 01 D6）。
+【观点】本项目若只需 HEIC **编码**以生成 Motion Photo HEIC 版，几乎必然触及 HEVC 编码器 → GPL 风险高于仅解码场景。这是主报告 3.9 N3「首版不做 HEIC」的重要依据。
+
+★ 发现 C：iOS 直连栈为 GPL-3.0
+【项目自述】pymobiledevice3 仓库明示 "This work is licensed under GPL 3.0. Planning to ship it in a closed-source app? Read this FAQ first."；libusbmuxd 为 LGPL-2.1；usbmuxd Windows 分支为 GPL-3.0；libimobiledevice 自述「未获 Apple 授权、赞助或认可」（附件 01 D1–D4）。
+【观点】与「闭源分发」或「保持现有分发形态」存在潜在冲突；且引入 GPL 库会与现有 GPL ffmpeg 叠加，合规审查复杂度上升。
+
+★ 发现 D：其余依赖相对宽松（仅线索，未逐一核验）
+【第三方合规声明/社区整理】Pillow = MIT-CMU(HPND)；pywin32 = PSF；comtypes 常见为 MIT（本轮未官方核验，标【暂时无法确认】）；pythonnet = MIT；pywebview = BSD-3-Clause；PyInstaller = GPL-2.0 带 bootloader exception（构建工具，通常不随 EXE 传染，但需复核）。
+【观点】以上均需在实际选型后由开发 AI / 法务复核，本报告不替代许可证审计。
+
+════════ 四、风险排序（供 D1 裁定）════════
+S1 若 D1 = 对外分发：现有 GPL ffmpeg 再分发合规 + 缺许可证清单/隐私说明 → **先于任何功能开发**。
+S2 若 D3 = 直接做 HEIC 版：引入 GPL wheel + ISOBMFF 复杂度 → 成本与合规双高。
+S3 若 D2 = 做 iOS 直连：GPL-3.0 库 + Apple 组件前置 + 版本漂移 → 维护成本最高。
+S4 若 D1 = 维持自用不分发：以上义务显著减轻，但**仍不应把「自用」当作许可证义务不存在的依据**（观点，非法律意见）。
+【不建议实施】在未完成许可证清点与产品定位裁定前，开始任何对外分发的构建或发布准备。

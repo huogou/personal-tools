@@ -1,0 +1,6 @@
+﻿UI_PID=34392 TITLE=实况照片备份查看器
+TREE|0|1||||
+ENTRIES=0 BUTTONS=0
+RESULT=PREVIEW_BUTTON_NOT_FOUND
+TREE2|0|1||||
+SCREENSHOT=C:\Users\Administrator\AppData\Local\Temp\lp_v11_accept\gui_v11_preview.png

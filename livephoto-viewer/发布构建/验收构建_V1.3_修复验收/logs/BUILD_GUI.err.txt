@@ -1,0 +1,121 @@
+916 INFO: PyInstaller: 6.22.3, contrib hooks: 2026.9
+942 INFO: Python: 3.12.12
+994 INFO: Platform: Windows-11-10.0.26340-SP0
+1008 INFO: Python environment: D:\SEO\发挥余热\实况照片备份查看器\.venv-build
+1033 INFO: Removing temporary files and cleaning cache in C:\Users\Administrator\AppData\Local\pyinstaller
+164 WARNING: Failed to collect submodules for 'webview.platforms.android' because importing 'webview.platforms.android' raised: ModuleNotFoundError: No module named 'android'
+2617 INFO: Module search paths (PYTHONPATH):
+['D:\\SEO\\发挥余热\\实况照片备份查看器\\发布构建\\验收构建_V1.3_修复验收',
+ 'D:\\CodeBuddy CN\\resources\\app\\extensions\\genie\\out\\vendor\\shim',
+ 'C:\\Users\\Administrator\\.octop\\portable\\runtime\\python312.zip',
+ 'C:\\Users\\Administrator\\.octop\\portable\\runtime\\DLLs',
+ 'C:\\Users\\Administrator\\.octop\\portable\\runtime\\Lib',
+ 'C:\\Users\\Administrator\\.octop\\portable\\runtime',
+ 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build',
+ 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages',
+ 'D:\\SEO\\发挥余热\\实况照片备份查看器']
+3080 INFO: Appending 'binaries' from .spec
+3081 INFO: Appending 'datas' from .spec
+3084 INFO: checking Analysis
+3084 INFO: Building Analysis because Analysis-00.toc is non existent
+3085 INFO: Looking for Python shared library...
+3085 INFO: Using Python shared library: C:\Users\Administrator\.octop\portable\runtime\python312.dll
+3086 INFO: Running Analysis Analysis-00.toc
+3086 INFO: Target bytecode optimization level: 0
+3087 INFO: Initializing module dependency graph...
+3090 INFO: Initializing module graph hook caches...
+3138 INFO: Analyzing modules for base_library.zip ...
+4629 INFO: Processing standard module hook 'hook-heapq.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+4783 INFO: Processing standard module hook 'hook-encodings.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+6885 INFO: Processing standard module hook 'hook-math.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+7168 INFO: Processing standard module hook 'hook-pickle.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+9373 INFO: Caching module dependency graph...
+9406 INFO: Analyzing D:\SEO\发挥余热\实况照片备份查看器\LivePhoto_Backup.pyw
+9593 INFO: Processing standard module hook 'hook-webbrowser.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+9613 INFO: Processing standard module hook 'hook-imageio_ffmpeg.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+9683 INFO: Processing standard module hook 'hook-platform.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+9798 INFO: Processing standard module hook 'hook-PIL.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+9915 INFO: Processing standard module hook 'hook-PIL.Image.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+10438 INFO: Processing standard module hook 'hook-xml.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+10477 INFO: Processing standard module hook 'hook-xml.etree.cElementTree.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+10714 INFO: Processing standard module hook 'hook-PIL.ImageFilter.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+11026 INFO: Processing standard module hook 'hook-_ctypes.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+11071 INFO: Processing standard module hook 'hook-webview.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\webview\\__pyinstaller'
+12414 INFO: Processing standard module hook 'hook-multiprocessing.util.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+13323 INFO: Processing pre-safe-import-module hook 'hook-typing_extensions.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+13361 INFO: SetuptoolsInfo: initializing cached setuptools info...
+15809 INFO: Processing pre-safe-import-module hook 'hook-gi.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+16060 INFO: Processing standard module hook 'hook-clr.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\pythonnet\\_pyinstaller'
+16117 INFO: Processing standard module hook 'hook-clr_loader.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+16287 INFO: Processing standard module hook 'hook-pycparser.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks'
+16518 INFO: Processing standard module hook 'hook-setuptools.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+16558 INFO: Processing pre-safe-import-module hook 'hook-distutils.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+16644 INFO: Processing standard module hook 'hook-sysconfig.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+16656 INFO: Processing pre-safe-import-module hook 'hook-jaraco.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+16660 INFO: Setuptools: 'jaraco' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.jaraco'!
+16677 INFO: Processing pre-safe-import-module hook 'hook-more_itertools.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+16680 INFO: Setuptools: 'more_itertools' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.more_itertools'!
+16930 INFO: Processing standard module hook 'hook-_osx_support.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+16998 INFO: Processing pre-safe-import-module hook 'hook-packaging.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+17391 INFO: Processing standard module hook 'hook-setuptools._vendor.jaraco.text.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+17396 INFO: Processing pre-safe-import-module hook 'hook-importlib_resources.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+17632 INFO: Processing pre-safe-import-module hook 'hook-backports.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+17634 INFO: Setuptools: 'backports' appears to be a full setuptools-vendored copy - creating alias to 'setuptools._vendor.backports'!
+18392 INFO: Processing pre-safe-import-module hook 'hook-tomli.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+18396 INFO: Setuptools: 'tomli' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.tomli'!
+19132 INFO: Processing pre-safe-import-module hook 'hook-wheel.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+19136 INFO: Setuptools: 'wheel' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.wheel'!
+20360 INFO: Processing pre-find-module-path hook 'hook-tkinter.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_find_module_path'
+20427 INFO: TclTkInfo: initializing cached Tcl/Tk info...
+21206 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+21409 INFO: Analyzing hidden import 'imageio_ffmpeg.binaries'
+21413 INFO: Analyzing hidden import 'webview.__pyinstaller'
+21418 INFO: Analyzing hidden import 'webview.__pyinstaller.hook-webview'
+21475 INFO: Processing pre-safe-import-module hook 'hook-importlib_metadata.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+21478 INFO: Setuptools: 'importlib_metadata' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.importlib_metadata'!
+21504 INFO: Processing standard module hook 'hook-setuptools._vendor.importlib_metadata.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+21574 INFO: Processing pre-safe-import-module hook 'hook-zipp.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\pre_safe_import_module'
+21576 INFO: Setuptools: 'zipp' appears to be a setuptools-vendored copy - creating alias to 'setuptools._vendor.zipp'!
+21638 INFO: Processing standard module hook 'hook-win32ctypes.core.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+23561 INFO: Analyzing hidden import 'webview._version'
+23566 INFO: Analyzing hidden import 'pythonnet._pyinstaller'
+23569 INFO: Analyzing hidden import 'pythonnet._pyinstaller.hook-clr'
+23570 INFO: Processing module hooks (post-graph stage)...
+23572 WARNING: Hidden import "pycparser.lextab" not found!
+23572 WARNING: Hidden import "pycparser.yacctab" not found!
+24010 INFO: Processing standard module hook 'hook-PIL.SpiderImagePlugin.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+24398 INFO: Processing standard module hook 'hook-_tkinter.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks'
+24419 INFO: Performing binary vs. data reclassification (1031 entries)
+25371 INFO: Looking for ctypes DLLs
+25467 INFO: Analyzing run-time hooks ...
+25471 INFO: Including run-time hook 'pyi_rth_inspect.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+25504 INFO: Including run-time hook 'pyi_rth_pkgutil.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+25511 INFO: Including run-time hook 'pyi_rth_setuptools.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+25516 INFO: Including run-time hook 'pyi_rth_multiprocessing.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+25522 INFO: Including run-time hook 'pyi_rth__tkinter.py' from 'D:\\SEO\\发挥余热\\实况照片备份查看器\\.venv-build\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks'
+25627 INFO: Creating base_library.zip...
+25645 INFO: Looking for dynamic libraries
+26401 INFO: Extra DLL search directories (AddDllDirectory): []
+26402 INFO: Extra DLL search directories (PATH): []
+27270 INFO: Warnings written to D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\build_work_gui\实况照片备份查看器_V1.3_修复验收\warn-实况照片备份查看器_V1.3_修复验收.txt
+27372 INFO: Graph cross-reference written to D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\build_work_gui\实况照片备份查看器_V1.3_修复验收\xref-实况照片备份查看器_V1.3_修复验收.html
+27443 INFO: checking PYZ
+27444 INFO: Building PYZ because PYZ-00.toc is non existent
+27445 INFO: Building PYZ (ZlibArchive) D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\build_work_gui\实况照片备份查看器_V1.3_修复验收\PYZ-00.pyz
+27949 INFO: Building PYZ (ZlibArchive) D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\build_work_gui\实况照片备份查看器_V1.3_修复验收\PYZ-00.pyz completed successfully.
+27997 INFO: checking PKG
+27998 INFO: Building PKG because PKG-00.toc is non existent
+27998 INFO: Building PKG (CArchive) 实况照片备份查看器_V1.3_修复验收.pkg
+40933 INFO: Building PKG (CArchive) 实况照片备份查看器_V1.3_修复验收.pkg completed successfully.
+40949 INFO: Bootloader D:\SEO\发挥余热\实况照片备份查看器\.venv-build\Lib\site-packages\PyInstaller\bootloader\Windows-64bit-intel\runw.exe
+40951 INFO: checking EXE
+40951 INFO: Building EXE because EXE-00.toc is non existent
+40952 INFO: Building EXE from EXE-00.toc
+40953 INFO: Copying bootloader EXE to D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\exe\实况照片备份查看器_V1.3_修复验收.exe
+41389 INFO: Copying icon to EXE
+41602 INFO: Copying 0 resources to EXE
+41605 INFO: Embedding manifest in EXE
+41809 INFO: Appending PKG archive to EXE
+41907 INFO: Fixing EXE headers
+42429 INFO: Building EXE from EXE-00.toc completed successfully.
+42453 INFO: Build complete! The results are available in: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\exe

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>实况照片查看器</title>
+<style>
+  body{margin:0;font-family:"Microsoft YaHei",sans-serif;background:#101418;color:#eee}
+  header{padding:20px;text-align:center;background:#1a2027}
+  header h1{margin:0;font-size:20px}
+  header p{margin:6px 0 0;color:#9aa5b1;font-size:13px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:20px}
+  .card{position:relative;height:220px;border-radius:10px;overflow:hidden;background:#222;cursor:pointer}
+  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .2s}
+  .card img.mov{display:none}
+  .card.playing img.cover{display:none}
+  .card.playing img.mov{display:block}
+  .card:hover img.cover{transform:scale(1.04)}
+  .lbl{position:absolute;left:0;right:0;bottom:0;padding:8px;font-size:12px;text-align:center;
+       background:linear-gradient(transparent,#000a)}
+  footer{text-align:center;color:#6b7681;padding:16px;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>📷 我的实况照片</h1>
+  <p>共 1 张 · 悬停预览，点击播放/暂停动态</p>
+</header>
+<div class="grid"><div class="card" title="点击播放/暂停"><img class="cover" src="thumb/IMG_0346.jpg" alt="IMG_0346"><img class="mov" src="../GIF动图/IMG_0346.gif" alt="IMG_0346"><div class="lbl">IMG_0346</div></div></div>
+<footer>由「实况照片备份查看器」生成 · 原始双件套请查看「原始文件」文件夹</footer>
+<script>
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('click', function(){
+      c.classList.toggle('playing');
+    });
+  });
+  // 悬停自动播放
+  document.querySelectorAll('.card').forEach(function(c){
+    c.addEventListener('mouseenter', function(){ c.classList.add('playing'); });
+    c.addEventListener('mouseleave', function(){ c.classList.remove('playing'); });
+  });
+</script>
+</body>
+</html>

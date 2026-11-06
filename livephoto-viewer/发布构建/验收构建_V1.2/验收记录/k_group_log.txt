@@ -1,0 +1,46 @@
+[PASS] K-1      10 个判定场景全部符合预期（相同/嵌套双向/独立/大小写/斜杠/尾斜杠/相对路径/前缀误判）
+[PASS] D-6-junction junction 判定=same
+[UNVERIFIED] D-6-short83 本机未启用 8.3 短文件名（GetShortPathName 返回原路径），该变体未验证
+[PASS] D-8      路径判定异常时 status=unknown（必须为 unknown → 阻止备份，无绕过）
+[PASS] K-2-ok   state=ok need=18.1 MB pairs=5
+[PASS] K-2-short 模拟可用 1 字节 < 预计 19018598 → 判定空间不足
+[PASS] K-2-timeout 注入快进时钟 → state=timeout（必须为 timeout = 未完成检查）
+[PASS] K-2-error 注入权限异常 → state=error（必须为 error = 检查失败）
+[cancel] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 00000154b9d16700] moov atom not found
+[in#0 @ 00000154b9d16300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work_141225\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[cancel] [成功] DUP_01
+[cancel] [成功] IMG_0346
+[cancel] [已取消] 用户取消，完成 2 组，未处理 2 组（下次备份自动续传）。
+[PASS] K-3      回调 item 事件索引=[0, 1, 2]（与已处理条目一一对应）
+[PASS] K-4      取消后：已处理 3 组（成功 2 / 失败 1）；.processed.json 记录 3 条（True=2 False=1，未处理的 2 组无任何记录）；原始文件 6 个且全部可打开=True
+[PASS] A-11     取消后 .processed.json 只记录已处理条目（3 条，其中成功 True=2 / 失败 False=1）；未处理条目未被写入；已复制文件完整可打开=True；续传空间存在（总 5 组 > 已处理 3 组）
+[resume] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 0000025a1a256700] moov atom not found
+[in#0 @ 0000025a1a256300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work_141225\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[resume] [成功] MULTI_01
+[resume] [成功] 中文 名称
+[resume] 网页查看器已生成: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.2\验收记录\work_141225\out_cancel\网页查看器\index.html
+[resume] 统计: 共5张，新处理2，跳过2，失败1。
+[PASS] K-11-resume 取消后再次备份：skipped=2（= 已成功条目数 2）ok=2 fail=1；合计 5 = 总配对数 5（已完成跳过、剩余继续处理、无重复）
+[crash] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 0000017dc74d6700] moov atom not found
+[in#0 @ 0000017dc74d6300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work_141225\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[crash] [成功] MULTI_01
+[crash] [成功] 中文 名称
+[crash] 网页查看器已生成: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.2\验收记录\work_141225\out_crash\网页查看器\index.html
+[crash] 统计: 共5张，新处理2，跳过2，失败1。
+[PASS] K-5      子进程被强杀(rc=9)后 .processed.json 已记录 2 条成功；复跑 skipped=2 ok=2 fail=1
+[PASS] K-12-cbex 回调抛异常时：备份仍完成 ok=4 fail=1；记录 [警告] 进度回调异常 6 条
+[PASS] K-6      首次弹出向导=True；标记文件落盘=True（first_run_v12.flag）；再次调用不再弹出=True；帮助入口可重开=True
+[PASS] K-6b     帮助入口重开向导：Toplevel 2 → 3
+[PASS] D-9/D-10 行内文案 ok='预计需要 3.0 GB · 目标盘可用 10.0 GB' timeout='空间检查未完成（目录过大已跳过），开始备份前请自行确认磁盘剩余空间' error='空间检查失败（可能无读取权限），请自行确认磁盘剩余空间' short='预计需要 3.0 GB · 目标盘可用 1.0 GB（空间不足 ⚠）'
+[PASS] D-5      取消勾选后橙色警告出现=True（文案='⚠ 关掉后备份里将没有原始文件，以后无法找回动态，不建议关闭'）；重新勾选后隐藏=True
+[PASS] C-4      统计卡数字=['7', '3', '6', '2', '2', '1']；下一步建议='⚠ 有 2 组同名照片需要你确认，建议先点开预览页逐组核对，再决定是否备份（另有 1 组处理失败，详情看日志）'
+[PASS] C-4b     全完整建议='✓ 全部配对完整，可以放心点「开始备份」'；不完整建议='⚠ 有 2 组文件不完整（缺图或缺视频）。程序不会判断文件损坏，建议检查导入方式后重新扫描'

@@ -1,0 +1,49 @@
+[preview] 已清理残留预览临时目录 1 个。
+[preview] [封面失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 0000018d973b64c0] moov atom not found
+[in#0 @ 0000018d973b6100] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[preview] 预览已生成: C:\Users\ADMINI~1\AppData\Local\Temp\livephoto_preview_w7s6qidp\index.html
+[preview] 统计: 扫描7 · 完整3 · 可预览6 · 待确认2 · 不完整2 · 失败1
+[preview] 已在默认浏览器打开预览（只读，未复制/修改原始文件）。
+[PASS] A-1      预览统计 total=7 complete=3 uncertain=2 incomplete=2 previewable=6 failed=1
+[PASS] A-2      预览前后源目录快照一致=True；源目录无 .processed.json=True
+[PASS] A-6      语料含中文+空格路径 2 个：['中文 子目录\\中文 名称.HEIC', '中文 子目录\\中文 名称.mp4']
+[backup] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024362c26700] moov atom not found
+[in#0 @ 0000024362c26300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[backup] [成功] DUP_01
+[backup] [成功] IMG_0346
+[backup] [成功] MULTI_01
+[backup] [成功] 中文 名称
+[backup] 网页查看器已生成: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.2\验收记录\work\out_v12\网页查看器\index.html
+[backup] 统计: 共5张，新处理4，跳过0，失败1。
+[PASS] A-3      产物目录=['原始文件', 'GIF动图', '网页查看器']；GIF=4；封面=4；index.html=True；.processed.json=True；统计 ok=4 fail=1 total=5
+[PASS] A-5      BROKEN_01 记失败且不影响其余 4 组；失败日志示例：[backup] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 0000024362c26700] moov atom not found
+
+[backup2] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 000001d706806700] moov atom not found
+[in#0 @ 000001d706806300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[backup2] 网页查看器已生成: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.2\验收记录\work\out_v12\网页查看器\index.html
+[backup2] 统计: 共5张，新处理0，跳过4，失败1。
+[PASS] A-4      二次运行 skipped=4 ok=0 fail=1
+[cb] [失败] BROKEN_01: [mov,mp4,m4a,3gp,3g2,mj2 @ 000001c4b2a66700] moov atom not found
+[in#0 @ 000001c4b2a66300] Error opening input: Invalid data found when processing input
+Error opening input file D:\SEO\鍙戞尌浣欑儹\瀹炲喌鐓х墖澶囦唤鏌ョ湅鍣╘鍙戝竷鏋勫缓\楠屾敹鏋勫缓_V1.2\楠屾敹璁板綍\work\corpus\鐓х墖 瀵煎叆\BROKEN_01\BROKEN_01.mp4.
+Error opening input files: Invalid data found when processing input
+
+[cb] [成功] DUP_01
+[cb] [成功] IMG_0346
+[cb] [成功] MULTI_01
+[cb] [成功] 中文 名称
+[cb] 网页查看器已生成: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.2\验收记录\work\out_cb\网页查看器\index.html
+[cb] 统计: 共5张，新处理4，跳过0，失败1。
+[PASS] A-10     带回调与不带回调的 .processed.json 逐字节一致=True；回调事件=['start', 'item', 'item', 'item', 'item', 'item']；条目索引单调递增=True；统计一致=True
+[PASS] A-9      V1.1 与 V1.2 CLI 统计行一致=True（统计: 共5张，新处理4，跳过0，失败1。）；产物清单一致=True；.processed.json 逐字节一致=True；rc=0/0
+[PASS] A-8      --cli rc=0；--preview rc=0（stdout 含「预览完成」=True）
+[PASS] A-7      连续 3 次预览后，带有效归属标记的临时目录数 = 1（['livephoto_preview_g_ukapfy']）

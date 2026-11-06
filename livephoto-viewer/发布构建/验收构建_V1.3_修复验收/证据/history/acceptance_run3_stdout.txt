@@ -1,0 +1,4 @@
+���Ϲ�����ɣ���·������=164���������Ԥ��=627
+[PASS] T-00 真实 WebView2 启动与就绪 | 实际：state=A4, visibility=visible, 首屏卡片=200, items=627, controller_errors=[]
+[FAIL] T-01 单张实况照片播放（真实视频解码） | 实际：真实鼠标点击 (634,1452) → 物理点击未起播，补一次 DOM click；state=None track=None rs=None t=None err=None src=
+[FAIL] T-02 暂停、继续、重播、播完回静止 | 实际：停止={} / 重播={} t=-1.000 / 播完={}

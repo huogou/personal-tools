@@ -1,0 +1,90 @@
+附件 03｜方向二：Apple Live Photo 与 Android Motion Photo · 规范要点与转换方案
+一手依据：https://developer.android.com/media/platform/motion-photo-format （Motion Photo format 1.0，中文 ?hl=zh-cn）
+Apple 侧依据：https://developer.apple.com/documentation/avfoundation/avcapturephotosettings/1648731-livephotomoviemetadata
+全部条目标注：官方依据 / 技术上可行尚未实测 / 需要真实设备验证 / 暂时无法确认 / 不建议实施
+
+════════ 一、两种格式的结构区别 ════════
+Apple Live Photo【官方依据】：主图（HEIC 或 JPEG）+ 独立影片文件（MOV，QuickTime），由 `AVMetadataQuickTimeMetadataKeyContentIdentifier` 与主图 `kCGImagePropertyExifMakerNote` 中的对应标识关联；AVFoundation 未指定时自动生成唯一内容标识符。→ 本质是「两个文件 + 元数据关联」。
+Android Motion Photo 1.0【官方依据】："Motion Photos are single files that contain a still photographic image and a short video, which includes audio recording." 主图（JPEG / HEIC / AVIF）+ 在其后追加的视频文件；主图内嵌 Camera XMP（呈现语义）与 Container XMP（定位视频）。→ 本质是「一个文件 + XMP 目录」。
+差异要点：① 文件数 2 vs 1；② 关联方式 元数据 ID vs XMP 目录 + 字节长度；③ 视频容器 Apple 为 MOV，Android 规范同时允许 video/mp4 与 video/quicktime；④ Android 规范对文件命名有强制正则，Apple 无同类规范。
+【观点】转换不是「改扩展名」，而是重建容器与元数据；且转换后原始双文件应保留，避免不可逆。
+
+════════ 二、Motion Photo 1.0 官方规范要点 ════════
+1 文件名【官方依据】
+   写入者应使用：`^([^\s/\\][^/\\]*MP)\.(JPG|jpg|JPEG|jpeg|HEIC|heic|AVIF|avif)`
+   即基名须以 `MP` 结尾；不符合时「Readers may ignore the XMP metadata, the appended video file, or the video contents」。
+   → 生成端必须重命名或另存，不能沿用 IMG_0346.HEIC 原名。
+2 容器结构【官方依据】
+   主图在前，媒体项按 `Container:Directory` 顺序「must be tightly packed」；仅一个 Primary 项且必须第一；仅一个 MotionPhoto（视频）项且**必须位于文件末尾，其后不得放置任何字节**。
+   位置计算：主图编码长度 + `Item:Padding`（如有）+ 之前各次要项 `Item:Length` 之和。
+3 Camera XMP【官方依据】
+   命名空间 `http://ns.google.com/photos/1.0/camera/`，前缀 Camera。
+   `Camera:MotionPhoto` Integer：0 不视为动态照片 / 1 视为；其他值按 0。原文特别提醒该字段「is not definitive and readers must always confirm that a video is present」（编辑器可能保留残留 XMP 而视频已被剥离）。
+   `Camera:MotionPhotoVersion` Integer：本规范定义为 "1"。
+   `Camera:MotionPhotoPresentationTimestampUs` Long：静帧对应视频帧的呈现时间戳（微秒），可为 -1（未指定）。
+4 ★ MicroVideo 系列已废弃【官方依据·关键纠错】
+   `Camera:MicroVideo`、`Camera:MicroVideoVersion`、`Camera:MicroVideoOffset`、`Camera:MicroVideoPresentationTimestampUs` 属旧 Microvideo V1 规范，本规范「deleted ... and must be ignored if present」；`MicroVideoOffset` 由 Container/Item 的 Item:Length（规范原文表述为 GContainer:ItemLength）取代以定位视频数据。
+   → 网上大量中文资料仍讲 `GCamera:MicroVideoOffset`，那是**旧格式**；照其实现无法产出标准 Motion Photo 1.0。主报告 §0 质疑 2 即指此。
+5 Container / Item XMP【官方依据】
+   Container 命名空间 `http://ns.google.com/photos/1.0/container/`，前缀 Container；`Container:Directory` = 有序结构数组。
+   Item 命名空间 `http://ns.google.com/photos/1.0/container/item/`，前缀 Item。
+   `Item:Mime`（必填）：image/jpeg | image/heic | image/avif | video/mp4 | **video/quicktime**。
+   `Item:Semantic`（必填）：Primary（有且仅一个）| MotionPhoto（有且仅一个，视频容器）| GainMap（Ultra HDR 主图时必需，且须排在视频项之前）。
+   `Item:Length`：次要媒体项必填，正整数，字节实际长度；0 表示与前一媒体项共享资源；Primary 项期望为 0。
+   `Item:Padding`：JPEG 主图可选；**HEIC/AVIF 主图必填且必须 = 8**（`mpvd` box 头长度）。
+   原文："Media items are expected to be in their original form, with no encoding applied."
+6 ISOBMFF（HEIC/AVIF）专属要求【官方依据】
+   "以 ISOBMFF 为基础的图像（例如 HEIC 和 AVIF）须具备的结构，其部分结束于顶层『动态照片视频数据』(mpvd) box"：
+   `aligned(8) class MotionPhotoVideoData extends Box('mpvd') { bit(8) data[]; }`，data 字段含全部视频字节；**mpvd box 的 size 不允许为 0**。
+   → 需 HEIF/ISOBMFF box 级读写能力；现有 Pillow（不具备 HEIC 编码）+ imageio-ffmpeg 栈不覆盖。
+7 呈现时间戳【官方依据】
+   未提供 `Camera:MotionPhotoPresentationTimestampUs` 时，读者应取「紧邻视频轨道时长一半之前的呈现时间戳」；若视频中含 `application/motionphoto-image-meta` 元数据轨，主图 XMP 的值须与该轨 `primaryImageFrameScoreDescr.presentationTimestampUs` 一致；未提供 XMP 值而元数据轨存在时该轨值必须为 -1。
+8 规范性引用（编码/容器）【官方依据】
+   T.81 JPEG、ISO/IEC 23008-12 HEIF、AVIF、Ultra HDR、ISO 16684-1 XMP Part1、Adobe XMP Part3、ISO/IEC 14496-10 AVC、ISO/IEC 23008-2 HEVC、AV1、ISO/IEC 14496-1 Systems、ISO/IEC 14496-12 ISOBMFF、ISO/IEC 14496-14 MP4、**Apple QuickTime File Format (MOV)**。
+9 Android 框架层支持证据【官方依据】
+   Media3 ExoPlayer「Images」表：JPEG Motion Photo = YES；HEIC Motion Photo = YES；HEIF/HEIC = YES；AVIF(baseline) 仅 Android 14+ 解码。
+   Media3「Retrieving metadata」：`MotionPhotoMetadata` 可提取图片/视频部分 offsets 与 lengths。
+   MediaStore：`SPECIAL_FORMAT_MOTION_PHOTO`；API 33 Photo Picker：`STANDARD_MIME_TYPE_EXTENSION_MOTION_PHOTO`。
+   【谨慎】以上证明 Android 框架/播放库有解析能力，**不等于各品牌默认相册 App 一定识别或播放**。
+
+════════ 三、任务书重点问题的逐项回答 ════════
+Q「JPEG/HEIC 与视频能否封装为 Android Motion Photo？」
+  【官方依据】能，规范明确主图可为 JPEG/HEIC/AVIF、视频项可为 video/mp4 或 video/quicktime。
+  【技术上可行，尚未实测】JPEG 版只需在主图 APP1 写入 XMP packet，再把视频字节追加到文件末尾并正确计算 Item:Length —— 纯字节拼接，现有 Python 标准库即可完成骨架。
+  【不建议实施（首版）】HEIC 版：需构造 mpvd box、处理 HEIF XMP box、Padding=8、引入 HEIF 编码/写入栈与 GPL wheel，且品牌兼容未知。
+Q「XMP 元数据及视频偏移信息的要求？」
+  【官方依据】见上 3/4/5：**不是** `MicroVideoOffset`，而是 `Container:Directory` + `Item:Length` + `Item:Padding` + `Item:Mime` + `Item:Semantic`；另有 `Camera:MotionPhoto`/`MotionPhotoVersion`/`MotionPhotoPresentationTimestampUs`。
+  【暂时无法确认】XMP 写入库选型（APP1 手工构造 vs python-xmp-toolkit/Exempi 等）、HEIF 内 XMP box 写入方式；需开发 AI 评估并做规范一致性校验器。
+Q「是否必须重新编码视频？」
+  【官方依据】规范未强制：Item:Mime 明确允许 `video/quicktime`（MOV），规范性引用含 Apple QuickTime、HEVC、AVC、MP4/ISOBMFF；且「Media items are expected to be in their original form, with no encoding applied」。→ 规范层面 iPhone 的 .mov 可原样追加，无需重编码或 remux。
+  【需要真实设备验证】目标 Android 设备/相册 App 能否解码 HEVC（iPhone 实况常见编码）；不能时才需转 H.264（项目现有 imageio-ffmpeg 已具备 libx264 转码能力，上游 V1.0 附件 03 已核实）。
+  【观点】「先原样追加 + 真机验证 + 不兼容再转码」比「无条件转码」更保真，但需多做一轮验证。
+Q「是否可以保留原始拍摄时间和其他元数据？」
+  【技术上可行，尚未实测】主图 EXIF DateTimeOriginal 可随 JPEG/HEIC 原样保留（文件级复制不改字节）；MP4/MOV 的 mvhd creation_time 同理；规范另有 `Camera:MotionPhotoPresentationTimestampUs` 承载静帧时刻。
+  【暂时无法确认】写入 XMP 时是否会破坏原 EXIF APP1 结构、各相册 App 以哪个字段排序；需真机验证。
+Q「不同 Android 品牌及相册应用的兼容性？」
+  【暂时无法确认】未找到任何官方品牌兼容列表；本轮**不虚构** Samsung / 小米 / OPPO / vivo / 华为 / Pixel 等品牌结论。
+  【已有官方依据】仅能确认 Android 框架层（Media3 / MediaStore / Photo Picker）存在对应支持。
+  【需要真实设备验证】见附件 06 验证矩阵。
+Q「是否存在 HEIC 作为动态照片载体的兼容性限制？」
+  【事实纠正】不是「规范不支持」：官方明确列出 `image/heic`、`.HEIC` 文件名、ExoPlayer「HEIC Motion Photo YES」。
+  【官方依据】真实限制在实现侧：HEIC/AVIF 主图须以 `mpvd` box 结束、Item:Padding 必须为 8、需 ISOBMFF 级写入。
+  【暂时无法确认】各品牌相册 App 对 HEIC Motion Photo 的实际识别率。
+
+════════ 四、三项重点评估的结论 ════════
+① 生成标准 Motion Photo 文件【技术上可行，尚未实测】
+   建议路径（非开发授权）：以 JPEG 主图为首版目标 → 构造 Camera/Container/Item XMP → 按 `…MP.jpg` 命名 → 追加视频字节 → 填 Item:Length → 独立校验器验证「XMP 可解析 / 目录顺序 / 长度求和 / 视频项在文件末尾 / 文件名正则」。
+   必须同时产出「可机器验证的规范一致性报告」，否则无法区分「文件生成成功」与「格式正确」。
+② 保留原始照片和视频作为独立文件【技术上可行，尚未实测】
+   转换应为只读输入 + 另存输出，不改动、不删除源双文件；项目 V1.2 已有 copy2 只读复制与安全取消模式可复用（上游 V1.0 附件 03）。
+   输出目录建议与现有「原始文件 / GIF动图 / 网页查看器」并列，避免与 `.processed.json`、`相册索引.json` 语义混淆【观点，需 ChatGPT 裁定】。
+③ 转换失败时提供普通照片 + 视频备用导出【技术上可行，尚未实测】
+   降级路径：XMP 写入失败 / 视频追加失败 / 校验不通过 → 回退为「原图 + 原视频」两个独立文件 + 明确提示，不产生半损坏的单文件。
+   红线【不建议实施】：禁止在校验失败时保留不完整 Motion Photo 文件并按成功处理。
+
+════════ 五、验收红线（任务书明确要求）════════
+【不建议实施】把「生成文件成功」等同于「真实手机播放成功」。
+二者必须分开验收：
+  阶段 A（桌面可验证）：字节结构 + XMP + 长度 + 命名 + Media3 解析（可用官方 ExoPlayer/MetadataRetriever 侧验证）。
+  阶段 B（必须真机）：目标 Android 品牌默认相册 App 中能识别为动态照片并能播放视频与音频。
+未完成阶段 B 前，不得使用「支持 Android 动态照片」「兼容 Motion Photo」等对外表述（主报告 3.7）。

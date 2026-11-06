@@ -1,0 +1,72 @@
+附件 03｜技术架构与关键实现说明（含源码行号）
+缩写：L = ROOT\LivePhoto_Backup.pyw；S = ROOT\album_scan.py；I = ROOT\album_index.py；M = ROOT\album_media.py；P = ROOT\album_page.py；A = ROOT\album_api.py；H = ROOT\album_host.py；W = ROOT\album_webview.py
+行号基于 2026-11-06 磁盘版本，未做任何修改。
+
+一、分层与调用链（代码层闭合，已核实）
+入口 L:2827 main() → L:2863 __main__；CLI L:2828-2842 (--cli)、L:2843-2857 (--preview)；GUI L:2858-2860 tk.Tk + App + mainloop
+GUI = tkinter/ttk（L:990-992），主窗口 App L:1586，标题「实况照片备份查看器 V1.3」L:1592，860×680 L:1593，但 header 徽章仍写 "V1.2" L:1857 → 版本显示不一致
+V1.3 接入链【事实】：L:42 `import album_host`（try/except，失败置 None）→ L:1625 AlbumHost 实例化 → L:1658-1660 双页容器 → L:1706-1731 页签条「备份/相册」→ L:1733-1758 切换 → L:1748-1755 首次切入才 ensure_started()（懒启动）→ H:68 P.build_album_page → H:73 A.AlbumApi → H:78/88 W.WebViewHost.start/attach → L:2705-2710 关闭 shutdown
+桥接：P:206-216 postMessage → H:121-157 getattr 动态分发 → H:159-165 __lpReply；W:394-398 → P:222-225 __lpEvent 推状态
+
+二、配对规则（任务书第 3 节重点）
+扩展名：L:53 PHOTO_EXTS={.heic,.heif,.jpg,.jpeg,.png}；L:54 VIDEO_EXTS={.mov,.mp4,.m4v}；S:21-22 同值
+L:57-72 find_live_photos：key = base.lower()（L:66），同名多文件被覆盖只留最后一个（L:68-71），须图+视都齐才成对（L:72）
+L:299-331 scan_groups：同 key=base.lower()（L:314），保留全部候选，分 complete / uncertain / incomplete（L:321-330）
+S:59-124 scan_source：os.walk 递归（:77），base.lower() 分组（:86），仅保留完整配对（:95-97），同名多候选取 photos[0]/videos[0]（:99-100，注释称计入待确认但无统计代码）
+不含目录 → 不同子目录同名会并组（历史报告 W4）；损坏视频仍计 complete
+EXIF / QuickTime metadata / Content Identifier：主程序全文件 Grep 零命中【未见实现】
+EXIF 仅用于排序：S:144-171 读 DateTimeOriginal(36867)/Digitized(36868)/DateTime(306)，仅 jpg/jpeg/png（S:24）；HEIC 跳过 EXIF 走 mtime（S:23,130-135）；回退链 EXIF → 视频 mtime → 图片 mtime（S:136-140）；排序 (-sort_ts, key.lower())（S:123）
+photo_key = rel_dir + "/" + name.lower()（S:115）；目录相册 = 相对路径第一层子目录名（S:108-113），根散落为 None
+只读性：S 全文仅 os.walk/os.stat/getmtime/relpath + Pillow 只读打开，无写源目录调用；album 测试 E-04「16→16 零写入」实测
+
+三、HEIC 解码与缩略图
+主程序【无】PIL / pillow_heif / Image.open import；README §5「Pillow HEIC/GIF 处理」与代码不符
+HEIC 主图从不解码：仅 shutil.copy2 原样复制（L:233-234）；所有可视图（封面/GIF）均由视频生成
+GIF：L:87-90 convert_to_gif，ffmpeg `-vf fps=12,scale=540:-1:flags=lanczos` `-loop 0`
+封面：L:93-95 extract_cover，ffmpeg `-vframes 1 -q:v 3` 输出 jpg，无缩放；落 网页查看器\thumb\<name>.jpg（L:268/272-280），预览页落临时 thumb（L:517/531-534）
+V1.3 封面：M:120-142 ensure_cover，优先复用 thumb，否则 `-vf scale=360:-1 -q:v 4` 落 播放缓存\cover\<key>.jpg；缓存键 sha1(rel|mtime_ns|size)[:16]（M:63-79）
+缓存复用：L:238 / L:276 / L:532「存在即跳过」
+
+四、视频播放与三轨兜底
+ffmpeg 来源：imageio_ffmpeg.get_ffmpeg_exe()（L:34-35, M:24-28），失败回退字符串 "ffmpeg"；_run_ffmpeg L:75-84 subprocess.run，非 0 抛 RuntimeError(stderr[:500])
+V1.2 网页查看器 build_html L:115-170：卡片 <img class=cover>(jpg) + <img class=mov>(gif)，CSS .playing 切换（L:140-142），JS 仅 `click → toggle('playing')`（L:156-162）；全文无 mouseenter/mouseleave（已删除，见 TEMP\lp_v13_protected\build_html_diff.txt）
+  → 但 测试样本\网页查看器\index.html:37-41 仍含悬停自播 JS，:27 写「悬停预览，点击播放/暂停动态」；使用说明.txt:38 亦写「鼠标悬停自动播放」→ 三方不一致
+V1.2 只读预览 build_preview_html L:352-425：用 <video> 点击播放 file://（L:388/399/411），勿与 build_html 混淆
+V1.3 三轨：T1 <video> file:// 直解原视频（P:295/404/411 ← A:193 to_file_url）；T2 M:96-105 transcode_to_mp4 libx264/crf22/yuv420p/main/level4.0/+faststart/aac128k/ac2，M:108-115 缓存命中跳过；T3 仅检查 输出目录\GIF动图\<name>.gif 是否存在（A:482-490），【无生成代码】；全败 → no_media_track + V-16 文案（A:492）
+V1.3 播放契约 P:245-335：preload="none" 默认静止（:404）、onCardClick→startCard（:328-331）、onended→stopCard（:269-272）、playing 单变量（:246/291）、Esc（:333-335）、无 mouseenter → 「点开才播、播完回静止」
+HEVC：7 个 album_*.py 全文 Grep 无 hevc/hvc1 处理分支；仅统一 H.264 转码；02 号 E-6 显示内置 ffmpeg 可解 hevc，但 02 号 E-7 与 U-01 明确「现有样本非 HEVC，不得据此宣称兼容」
+
+五、相册索引与落盘
+I:87-94 字段：schema="livephoto-album-index/1.0"（I:21）、updated_at、source_root、albums[{id,name,kind,source_path,created_at,note}]、assignments{photo_key:[album_id]}、orphans[]
+落盘 输出目录\相册索引.json（I:22/100-101），+.bak/.tmp（I:23-24）；写入时机 A:307 扫描完成、A:345/371/385/396/407/419 各次 CRUD
+原子写 I:166-196：tmp → fsync → copy2 旧件到 .bak → os.replace；异常删 tmp 保留原文件；未知 schema 置 write_blocked 禁写（I:143-153）；损坏自愈 load() I:113-141 读 .bak 回写，均失败返回 broken
+取消不落盘：S:92-93 检查点返回 cancelled，A:275-280 直接 return 不调 idx.save()
+与 .processed.json 完全隔离（I 无引用），album 测试 C-12 实测字节未变
+【待核实】source_root 为绝对路径，移动硬盘换盘符/重开后索引行为未实测
+
+六、WebView2 宿主与降级
+方案 = pythonnet(clr) 直接驱动 WebView2 SDK 程序集，非 pywebview 窗口（W:7-35 说明偏差：pywebview file:// 会起 Bottle 端口且须主线程，与 Tk 冲突）
+W:174-180 clr.AddReference + CoreWebView2Environment；W:80-95 DLL 查找（pywebview lib → _MEIPASS → exe 目录 → 模块目录），缺 Microsoft.Web.WebView2.Core.dll / WebView2Loader.dll 即 start() 返回 False（W:160-164）
+W:202-205 .NET STA 线程、W:216-228 PeekMessageW 消息泵、W:302-343 SetParent 挂入 Tk 随 <Configure> 缩放
+H:45-48 用户数据目录 %LOCALAPPDATA%\实况照片备份查看器\相册页；H:264-285 _run_on_tk 用 root.after(0)+Event.wait 编组
+降级：start() 失败 → H:82-86 推 A8 → P:472-474「用浏览器打开」→ H:220-235 webbrowser.open 静态 album.html
+【缺陷】W:105-129 webview2_runtime_present() 定义但全项目无调用点，运行时探测未接入降级判定；S:174 count_groups / I:43 photo_key 同样为死代码
+
+七、备份流程与安全性
+源数据安全：全文件仅 shutil.copy2（L:233-234）；无 os.remove/unlink/rename/move 针对源；唯一 rmtree L:485 仅清 temp 下 livephoto_preview_* 且经 _is_our_preview_dir 归属校验（L:441-456/476）
+产出：原始文件\（L:210/232）、GIF动图\（L:211/236）、网页查看器\（L:166/272）、.processed.json（L:100/249）、临时预览目录（L:436/511）
+增量判重 key = basename(video).lower() 去扩展名 + "|" + dirname(video)（L:226），done[key] 真则 skip（L:227-228），逐条落盘（L:249）
+磁盘空间预检 L:670-714 三态 ok/timeout/error（GIF 按 2MB/张估算）、check_free_space L:717-728、异步 L:2194-2218、备份前阻塞复核 L:2254-2272
+路径安全 L:640-667 五态；start() 对 same/out_in_src/src_in_out/unknown 一律停（L:2490-2499）
+取消 L:173-188 + L:250-252 + L:254（取消后仍保存已完成记录）；关闭拦截 L:1635 / L:2697-2711；摘要二次确认 SummaryDialog L:1199-1330
+错误处理：逐条 try/except → [失败]（L:244-247）；封面抽帧失败静默 continue（L:277-280）；空目录 L:206-208 / GUI L:2577-2580；空间不足弹窗 L:2504-2517；日志仅 GUI 内存 Text（L:2106-2127 / L:2714-2721），无 logging 模块、无日志文件落盘
+
+八、联网与运行环境
+主程序【无】requests/urllib.request/socket/http；urllib.parse.quote（L:31）仅本地 URL 编码；webbrowser.open（L:547/2665/2674）打开本地路径；subprocess 仅调 ffmpeg
+但 启动备份查看器.bat:15-19 `pip install --quiet pillow imageio-ffmpeg`、:9 python.org 提示 → 源码版首次运行需联网；README §5「零联网」表述不严谨
+运行时前提：Python 3.12（__pycache__ 为 cpython-312）、imageio-ffmpeg、Pillow；V1.3 追加 pythonnet 3.2.1 / WebView2 SDK 两个 DLL / 系统级 Edge WebView2 Runtime（02 号 E-1 实测 pv=153.0.4234.48）
+无 Git 仓库（project.json repo.type=none；git rev-parse 实测失败）
+
+九、技术可行性 8 项实测（V1.3设计\02_…md §三，属实测但非 HEVC 播放实测）
+E-1 WebView2 153.0.4234.48 已装｜E-2 HEVC/HEIF/AV1/VP9 扩展已装（结论措辞「具备解码条件/大概率可行」）｜E-3 .NET 4.8.1+（Release=534296）｜E-4 pywebview 6.2.1 wheel 可下载｜E-5 pythonnet 3.2.1 wheel 可下载｜E-6 ffmpeg 编码含 libx264、解码含 hevc/h264｜E-7 样本为 H.264 非 HEVC｜E-8 无 git 仓库
+注意：E-4/E-5 仅证明 wheel 可下载，不等于已安装/已打包；§六「EXE 增量 +2~6 MB」为预估未实测

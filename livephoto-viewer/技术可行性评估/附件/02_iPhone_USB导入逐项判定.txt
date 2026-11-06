@@ -1,0 +1,79 @@
+附件 02｜方向一：iPhone 直接连接 Windows 导入实况照片 · A–E 分类逐项判定
+分类定义（任务书 §二.1）：
+A = Windows 现有机制可以实现
+B = Python 现有技术架构可以实现
+C = 需要额外组件或驱动
+D = 需要真实 iPhone 设备验证
+E = 当前无法确认或存在明显限制
+判定原则：一项可同时属于多类；【已有官方依据】与 A–E 是两个维度，不互相替代。
+
+────────────────────────────────────────────────────────────────
+Q1 Windows 能否通过 USB 直接识别 iPhone？
+判定：A + C
+【已有官方依据】Microsoft WPD 驱动概览：Windows 内置类驱动支持 PTP / MTP / MSC over USB（附件 01 C1）。
+【已有官方依据】Apple 120267：Windows PC 需「从 Microsoft Store 安装『Apple 设备』App」，USB 连接后按提示解锁并点「信任此电脑」，再由 Windows「照片」App 导入（C1/B2/B5）。
+说明：识别分两层——系统层以 PTP 便携设备枚举（A），但完整设备服务与稳定导入依赖 Apple 提供的组件（C）。
+【需要真实设备验证】不同 Windows 版本 / iOS 版本 / 是否装 Apple 设备 App 的组合行为。
+
+Q2 是否需要 Apple Devices、Apple Mobile Device Service 或其他驱动组件？
+判定：C
+【已有官方依据】Apple 120267 明确要求安装「Apple 设备」App；B5 说明在 Apple 设备 App 边栏选择设备并可能需点「信任」；B6 说明文件共享的前置条件为最新版 Apple Devices + Windows 10+ + 最新版 iOS/iPadOS。
+【项目自述】pymobiledevice3 README：Windows/Linux 需先装平台前置「iTunes 或 usbmuxd」；libusbmuxd README：Windows/macOS 可用 iTunes 提供的 usbmuxd（附件 01 D1/D2）。
+【已有官方依据】iOS 17+ 相关：pymobiledevice3 文档说明 Apple 引入 CoreDevice / RemoteXPC，需要建立 trusted tunnel；iOS 17.0–17.3.1 在 Windows 上还需额外驱动且项目不提供（D1/D3 派生说明，属项目自述）。
+结论：无论走 Windows 导入还是 Python 直连，都需要 Apple 侧组件，无法做到「零额外组件」。
+
+Q3 Python 能否实现设备识别和媒体访问？
+判定：B + C（无官方 Python API）
+路径 1（推荐，绕开协议栈）：不直接访问设备，让用户用 Windows 现有方式把照片导入本地目录，Python 只做本地文件扫描与配对。项目现有 `album_scan.py` / `scan_groups` 即此模式，纯本地、零新增设备依赖【技术上可行，尚未实测】。
+路径 2（WPD COM）：调用 `IPortableDeviceManager::GetDevices` 枚举、`IPortableDevice::Open` 连接、`IPortableDeviceContent` 枚举/读取对象（附件 01 C2/C3）。这是 Win32 COM API，Microsoft 未提供官方 Python 绑定，需 pywin32 / comtypes 等社区绑定【C】；Python 侧可用性与稳定性【需要真实设备验证】。
+路径 3（iOS 协议栈）：pymobiledevice3 纯 Python，提供 `usbmux list`、AFC 文件访问、备份等（附件 01 D1）。但依赖 Q2 的前置组件，且为 GPL-3.0【C + 许可证风险】。
+【暂时无法确认】AFC 通道能否读取完整照片库（而非仅 App 沙盒 / 需 house_arrest），项目文档未给出可复核结论。
+
+Q4 能否直接读取 iPhone 中的照片及 Live Photo 配套视频？
+判定：A + E
+【已有官方依据】Apple 120267：Windows「照片」App 会显示所连接设备上的全部照片和视频并提供导入（B2）。
+【项目自述】本项目 V1.2 的真实来源即为「图 + 视频两个文件」的成对备份（README、使用说明；上游 V1.0 报告 3.3），说明该流程在实践中能产出成对文件。
+【E / 需要真实设备验证】Apple 官方文档未承诺「Live Photo 必然以同名 HEIC + MOV 成对导出」，也未说明导出时的命名规则；项目现有配对仅靠同名基名（上游 V1.0 3.4），若命名规则变化即失效。
+【已有官方依据·限制】B3：USB 导入 PC 时 HEIF/HEVC「可能转换为 JPEG 或 H.264」，需开「保留原片」→ 即使读到文件，格式也可能已被改变。
+
+Q5 能否识别 Live Photo 关联信息，而不只是依赖文件名？
+判定：【已有官方依据】机制存在 + D（导出后是否保留未知）
+【已有官方依据】Apple `livePhotoMovieMetadata`：「A Live Photo movie always contains a AVMetadataQuickTimeMetadataKeyContentIdentifier key, associating the movie with a similar identifier in the kCGImagePropertyExifMakerNote property of the corresponding still image」（附件 01 B1）。即官方确有用 Content Identifier 关联主图与影片的机制，不是只有文件名。
+【E / 需要真实设备验证】该机制位于 iOS 拍摄/Photos 框架层；Windows USB/PTP 导出后，QuickTime metadata 与 MakerNote 是否原样保留在两个文件里，Apple 官方无说明，本轮未找到任何一手依据。
+【技术上可行，尚未实测】若导出后元数据保留，可用 ffprobe / exiftool 类工具读取 QuickTime `com.apple.quicktime.content.identifier` 与 TIFF MakerNote 做配对；具体字段路径与解析器选型【暂时无法确认】，须开发 AI 在真机样本上复核。
+【观点】在拿到真机样本前，不应把「用 Content Identifier 配对」写成可实现能力；上游 V1.0 报告已确认项目当前仅按同名基名配对。
+
+Q6 能否保留原始 HEIC/JPEG、MOV、拍摄时间及相关元数据？
+判定：【已有官方依据】存在明确限制 + E
+格式【已有官方依据】B3：USB 导入 PC 时 HEIF/HEVC 可能转 JPEG/H.264；避免需 iPhone「设置→App→照片→保留原片」。B2 又建议改「兼容性最佳」（此后以 JPEG/H.264 拍摄）。两条官方口径相互制约：**要 Windows 兼容就牺牲原格式，要原格式就需额外设置且兼容性下降**。
+全分辨率【已有官方依据】B2：开启 iCloud 照片时须先把全分辨率原件下载回设备再导入 PC；B4：优化存储时全分辨率在 iCloud，设备上是节省空间版本。
+拍摄时间/元数据【技术上可行，尚未实测】EXIF DateTimeOriginal 与 QuickTime creation_time 属标准字段，文件级复制可保留；但「导入过程是否重写元数据」【需要真实设备验证】。
+【观点】任务书「保留原始 HEIC/JPEG、MOV」的目标，在 Apple 官方口径下不是无条件可满足，属产品级约束而非纯工程问题，建议列入主报告 D1/D4 一并裁定。
+
+Q7 iCloud 优化存储对导入有什么限制？
+判定：【已有官方依据】明确限制 + 需联网
+B2 原文：「如果你打开了『iCloud 照片』，则必须将照片原始的全分辨率版本下载到 iPhone 或 iPad，然后再导入到 PC。」
+B4 原文：「当『最佳化储存空间』开启时，完整解析度的照片和影片会存放在 iCloud 中；如有需要，节省空间的版本会存放在装置上。」
+B5：开启 iCloud 照片时，Apple 设备 App 边栏「照片」不显示同步选项。
+推论【观点，基于官方原文】：USB 是「从设备本地取文件」的通道，若原件只在 iCloud，USB 直导无法凭空取回全分辨率；补下载需联网 + Apple ID。因此「纯本地零联网」与「优化存储下保证原片」不可兼得。
+【不建议实施】把 iCloud/云端中转作为默认方案（主报告 3.9 N5），除非产品定位 D1 改为允许联网。
+
+Q8 如何处理用户未授权设备访问、设备断开、传输中断？
+判定：B（应用层可设计）+ D（需真机验证）+ E（无官方 iOS 侧保证）
+未授权【已有官方依据 + 技术上可行】设备未解锁、未点「信任」时不会建立可访问会话（B2/B5/D1 `usbmux list` 后首条命令触发 Trust 提示）；应用应在枚举为空 / Open 失败时给出明确引导，不得静默重试或猜测设备。
+设备断开【技术上可行，尚未实测】WPD 提供 `IPortableDevice::Advise` 事件回调与 `Cancel`（C3）；应在每个传输单元做存在性校验。
+传输中断【技术上可行，尚未实测】WPD `CreateObjectWithPropertiesAndData` 语义为「Commit 前对象不落设备、Revert 可放弃」（C4/C5），可作为原子写入基础；项目 V1.2 已有「逐条落盘 + 安全取消 + 取消后保存已完成记录」的工程模式（上游 V1.0 附件 03），可复用思路。
+【E】Apple 未提供 Windows 侧「会话一致性 / 断点续传」的官方保证；iCloud 下载中断、锁屏、USB 供电等场景行为【需要真实设备验证】。
+【观点】必须遵守「验证完成前不删除任何原始文件」；上游 V1.0 已确认项目现有流程为只读复制（copy2），该红线应延续到跨设备扩展。
+
+────────────────────────────────────────────────────────────────
+汇总表（8 问 → A–E）
+Q1 识别        A + C
+Q2 驱动        C
+Q3 Python 访问 B + C
+Q4 读双文件    A + E（D）
+Q5 关联信息    官方机制存在 + D + E
+Q6 保留原格式  官方限制 + E
+Q7 优化存储    官方限制 + 需联网
+Q8 异常处置    B + D + E
+结论【观点】：8 问中无一可判定为「纯 A（Windows 开箱即用）」或「纯 B（Python 零依赖即可）」；全部涉及 C / D / E。这支持主报告①-2「不建议做 iOS 设备层直连」的建议。

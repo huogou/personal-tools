@@ -1,0 +1,65 @@
+附件 05｜已知 Bug、技术风险与文档冲突清单
+排序依据：对「能否交接 / 能否发布 / 能否正常使用」的阻断程度；每条附证据路径。
+
+一、S1 阻断级（不解决无法交接或发布）
+R1 V1.3 播放契约未跑通
+   事实：GUI 实测 12 项 9 PASS / 3 FAIL（B-04 点击后播放态=0，轨道 T1、readyState=0；B-06 重播/播放中点击即停=0；B-08 同时只播一张=0）
+   影响：任务书「已验证实况播放可行性」不成立；T2 兜底未生效、T3 GIF 无生成代码 → 三轨实际只剩未跑通的 T1
+   证据：C:\Users\Administrator\AppData\Local\Temp\lp_v13_gui\v13_gui_results.json、v13_gui_log.txt；album_page.py:245-335；album_api.py:462-492
+R2 三份权威文档与磁盘严重漂移，且文档内部互相矛盾
+   事实 A：README.md:34-35 / 项目实时进度.md:14,16,39 / project.json:84 均称「V1.3 设计评审阶段、零代码改动、待开发授权」
+   事实 B：磁盘有 7 个 album_*.py（2,598 行）、主程序 2,864 行（开发前基线 2,715，净 +149）、__pycache__ 7 个 album_*.pyc、V1.3 双 EXE 53 MB、3 组 V1.3 测试及结果
+   事实 C：V1.2 发布状态三处冲突——README §4「已发布/V1.2」、§7「正式版仍 V1.0 未替换」、§9/§10「待独立验收」；项目实时进度.md §1「V1.2 未发布」；project.json milestone「V1.2 已正式发布 dist 替换为 V1.2」
+   事实 D：README §7 称 dist 39.4 MB，§4 与实测均为 41,878,941 B；README:63 称 V1.2 源码 2401 行，实测基线 2715 / 当前 2864
+   裁断：以磁盘哈希与源码为准（dist = V1.2 正式版，见附件 03），文档冲突列为待裁定，本报告不替产品判定权威
+   影响：ChatGPT 若直接读文档，会得到与真实状态相反的产品画像
+   证据：ROOT\README.md、ROOT\项目实时进度.md、ROOT\project.json、ROOT\历史备份\备份_V1.3_开发前_20261102\LivePhoto_Backup.pyw
+R3 真实 iPhone HEVC .mov 样本缺失
+   事实：全项目 .mov/.hevc/.h265 文件数 = 0；唯一视频样本为 H.264/avc1 的 .mp4；HEIC 主图内部 hvc1 属静态图像编码
+   事实：不少于 7 处文档明令「不得宣称 HEVC 兼容」：文档\…-V1.1 EXE独立构建与验收报告.md:28/277/314、文档\…-V1.2 实现与交付报告.md:236(U-4)、发布构建\验收构建_V1.2\设计验收记录\V1.2设计验收报告.md:91、项目实时进度.md:62(T11)、文档\V1.3_开发授权单.md:48(红线5)、V1.3设计\02_…技术可行性.md:55、V1.3设计\08_…检查表.md:77、V1.3设计\07_…文案清单.md:80
+   注意：02 号 E-2「HEVC 扩展已装」仅为「具备解码条件/大概率可行」的推断，不是播放兼容性实测
+
+二、S2 发布前必解
+R4 V1.3 无验收凭证 + 测试脚本假绿
+   发布构建\验收构建_V1.3\ 无 验收记录\ / 设计验收记录\ / README / 结果 JSON / 截图 / 实施报告（V1.1、V1.2 均有）
+   V1.3 检查表 75 项为空白模板；全项目无「实施报告」文件，但 album_webview.py:30 与 album_api.py:10 引用了它
+   test_v13_protected.py:121-123 存在写死 True 的假断言；test_v13_gui.py:272 return 0 恒 0（3 FAIL 仍退出码 0）
+R5 >500 张静默不显示
+   album_api.py:186 get_state 仅前 500 张、:324-334 list_photos 上限 1000，但 album_page.py:507 loadPhotos 固定 offset:0 limit:500；无分页/无限滚动/虚拟列表；无「还有更多」提示 → 用户可能误以为照片丢失
+R6 测试证据存于系统临时目录
+   全部 V1.3 结果 JSON / 日志 / 3 张截图位于 C:\Users\Administrator\AppData\Local\Temp\lp_v13_*，项目目录内零结果文件；系统清理即永久丢失
+R7 配对仅依赖文件名
+   key=base.lower() 不含目录 → 不同子目录同名并组（历史报告 W4）；损坏视频仍计 complete；无 EXIF / QuickTime Content Identifier 关联
+   影响：iPhone 以 IMG_xxxx 命名、跨年份/跨设备备份时存在误配风险（【推断】，未见真实失败样本）
+R8 ffmpeg 中文路径乱码
+   历史 W2 登记；V1.2 截图 main_S4_已扫描.png 日志红字可见乱码字符与 8.3 短名 ADMINI~1
+R9 V1.3 实现残缺
+   T3 GIF 兜底无生成代码（album_api.py:482-490 只检查存在）；A2/A3/A7 扫描/建索引/转码中无覆盖层仅状态条；A4 覆盖层把「就绪」列入 grid.empty 并与 A5 复用同一句文案（album_page.py:452/461-467）
+   死代码：album_webview.py:105 webview2_runtime_present()、album_scan.py:174 count_groups()、album_index.py:43 photo_key() 全项目无调用点
+R10 外部运行时前提未闭环
+   依赖系统级 Edge WebView2 Runtime + Microsoft.Web.WebView2.Core.dll / WebView2Loader.dll；缺则走 A8「用浏览器打开」降级
+   但 webview2_runtime_present() 未接入降级判定；02 号 RK-2 与项目实时进度.md T10 均登记该风险（中）
+
+三、S3 登记级
+R11 DPI 125% 布局（V1.2 检查表 G-5）、8.3 短文件名路径判定变体（D-6⑤）均未实测；见 项目实时进度.md T7/T8
+R12 文案与实现漂移：使用说明.txt:38 与 测试样本\网页查看器\index.html:27,37-41 仍写「悬停自动播放」，当前 build_html 已删除悬停 JS 改为点击；窗口标题 V1.3 而 header 徽章 V1.2；README/使用说明完全未提「相册」页签
+R13 发布材料缺口：无图标 .ico、无安装/卸载说明、无独立隐私说明、无第三方依赖许可证清单、无 Git 仓库、无用户反馈渠道（详见附件 07）
+R14 .processed.json（V1.2 增量判重）与 相册索引.json（V1.3）相互独立、无引用；source_root 存绝对路径，移动硬盘换盘符或断开重开后行为【未验证】
+R15 无持久化文件日志：日志仅 GUI 内存 Text，程序关闭即丢失；异常排查依赖用户当场截图
+
+四、历史报告已登记但本轮未复测的遗留项（原文口径保留）
+· V1.1 端到端：CLI 跨进程临时目录残留（已修复但修正脚本未由作者复跑，最终全绿待确认）
+· V1.1 EXE 构建：U2 EXE 级目录切换刷新/清理失败隔离/不误删未重跑、U3 浏览器 overlay 18 项细粒度交互 EXE 级未逐项复测
+· V1.2：U-7 重启后向导不再弹；ffmpeg 中文乱码；检查表多项「已实现待人工验收」
+· V1.3 设计包 RK-1…RK-8（见 V1.3设计\02_…技术可行性.md §七）
+
+五、文档冲突一览（供 D2 裁定）
+编号 冲突内容                                     来源 A                        来源 B                      当前采信
+C1   V1.2 是否已发布                             README §4 / project.json / 设计验收报告 = 已发布   README §7/§9/§10 / 实时进度 §1 = 未发布    以哈希为准：已发布（dist=V1.2）
+C2   V1.3 是否有代码                             三份文档 = 零代码改动、待授权     磁盘 7 模块 + 主程序 +149 行 + EXE + 测试   以磁盘为准：有
+C3   V1.2 源码行数                              README:63 = 2401 行             历史备份 2715 / 当前 2864 行                 文档失准，待核实来源
+C4   dist 大小                                  README §7 = 39.4 MB             README §4 / 实测 = 41,878,941 B             以实测为准
+C5   网页查看器播放交互                          使用说明/旧产物 = 悬停自播       当前 build_html = 点击切换                   以源码为准，文案待同步
+C6   播放可行性                                 任务书 = 已验证                  V1.3 GUI 3 FAIL / 各版报告「未验证」         以测试记录为准：未跑通
+C7   是否零联网                                 README §5 = 零联网              启动备份查看器.bat:15-19 pip install         主程序零联网，启动脚本非
+C8   HEIC 处理方式                              README §5 = Pillow HEIC/GIF 处理 主程序无 PIL import，HEIC 不解码            以源码为准

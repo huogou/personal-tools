@@ -1,0 +1,3 @@
+短路径        len= 277 -> '{"state":"playing","track":"T1","fail":"","rs":4,"ns":1,"t":0,"playing":1,"err":null}'
+长路径        len= 344 -> '{"state":"failed","track":"","fail":"no_media_track","rs":0,"ns":0,"t":0,"playing":0,"err":null}'
+written: D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\诊断\probe_long_path_results.json

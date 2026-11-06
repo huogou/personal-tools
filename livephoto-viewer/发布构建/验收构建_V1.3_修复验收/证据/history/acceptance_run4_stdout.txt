@@ -1,0 +1,6 @@
+���Ϲ�����ɣ���·������=164���������Ԥ��=627
+[STEP] ready（剩余 0 步）
+[PASS] T-00 真实 WebView2 启动与就绪 | 实际：state=A4, visibility=visible, 首屏卡片=200, items=627, controller_errors=[]
+[STEP] t01（剩余 0 步）
+[FAIL] T-01 单张实况照片播放（真实视频解码） | 实际：真实鼠标点击 (556,557)；客户区原点(34,89)；卡片 613x817；屏幕内=True → 物理点击未起播，补一次 DOM click；捕获瞬间={}；随后 state=None track=None rs=None t=None err=None
+[STEP] t02（剩余 0 步）
