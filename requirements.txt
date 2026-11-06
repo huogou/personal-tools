@@ -1,0 +1,4 @@
+pywebview==6.2.1
+pythonnet==3.2.1
+Pillow==13.0.0
+imageio-ffmpeg==0.6.0

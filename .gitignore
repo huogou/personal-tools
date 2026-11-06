@@ -1,20 +1,10 @@
-# 一次性检测报告与个人数据（不入库）
-*.xlsx
-*检测结果*
-*.json
-*.yaml
-# 抓包产物（含登录态）
-captures/
-session/
-profile/
-# 打包产物
+# 打包产物（40MB EXE，可由源码重建，不入库）
 dist/
+# AI 工具产物
+.workbuddy/
+.loomy-attachments/
 __pycache__/
 *.pyc
-*.log
-# 编辑器与系统
-.vscode/
-.idea/
 .DS_Store
 Thumbs.db
 desktop.ini
@@ -23,5 +13,41 @@ desktop.ini
 .env.*
 *.pem
 *.key
-id_rsa*
-id_ed25519*
+
+# 本地虚拟环境（可由 requirements 重建）
+.venv-build/
+
+# 历史备份与归档（体积大，本地留档即可）
+历史备份/
+
+# 构建中间产物与可执行文件（可由 spec 重建）
+发布构建/**/build_work*/
+发布构建/**/build_work_gui/
+发布构建/**/build_work_cli/
+发布构建/**/exe/
+发布构建/**/*.exe
+build/
+*.spec.bak
+
+# 测试与诊断临时语料（硬链接/副本，可由脚本重建）
+**/work/
+**/work_*/
+**/sp/
+**/sp2/
+**/udd/
+**/EBWebView/
+
+# 运行日志与崩溃转储
+*.log
+
+# personal-tools 仓库根 .gitignore 含 *.json / *.yaml，
+# 会把本子项目的 project.json 与验收证据 JSON 一起排除；在此重新包含。
+# 注意：否定规则必须写在排除 .processed.json 之前，后匹配优先。
+!*.json
+!**/*.json
+!*.yaml
+!**/*.yaml
+
+# 运行时增量记录（含本地绝对路径，不入库）——放在最后，确保最终被排除
+.processed.json
+

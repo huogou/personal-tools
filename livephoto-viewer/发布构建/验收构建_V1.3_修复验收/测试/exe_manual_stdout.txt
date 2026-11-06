@@ -1,6 +1,0 @@
-主窗口出现 hwnd=6754200
-P1-源目录 -> 输入 D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\测试\work_manual\源目录 中文 空格
-P1-输出目录 -> 输入 D:\SEO\发挥余热\实况照片备份查看器\发布构建\验收构建_V1.3_修复验收\测试\work_manual\输出目录
-静止基线帧差：{'diff_ratios': [], 'max': None, 'mean': None}
-播放中帧差：{'diff_ratios': [], 'max': None, 'mean': None}
-停止后帧差：{'diff_ratios': [], 'max': None, 'mean': None}
